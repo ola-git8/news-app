@@ -1,0 +1,9 @@
+# Ignore API keys
+config.js
+
+# Ignore node_modules if you ever install npm packages
+node_modules/
+
+# Ignore build or dist if you ever build frontend
+dist/
+build/
