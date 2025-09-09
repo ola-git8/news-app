@@ -1,4 +1,4 @@
-
+const API_key = "bf99c6b3e30c4dbfb200a2025bd9c8b8"
 
 function loadCategoryNews(category) {
     fetch(`https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${API_key}`)
