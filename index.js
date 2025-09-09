@@ -1,7 +1,7 @@
 const API_key = "bf99c6b3e30c4dbfb200a2025bd9c8b8"
 
 function loadCategoryNews(category) {
-    fetch(`https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${API_key}`)
+    fetch(`/api/news?category=${category}`)
         .then(response => response.json())
         .then(data => {
             displayNews(data.articles);
@@ -15,21 +15,26 @@ function searchNews() {
     
     if (!query) return; // prevent empty search
     
-    fetch(`https://newsapi.org/v2/everything?q=${query}&apiKey=${API_key}`)
+    fetch(`/api/news?q=${query}`)
         .then(response => response.json())
         .then(data => {
-            // Show search heading ✅
             const newsContainer = document.getElementById('newsContainer');
+            
+            // Add heading above search results
             newsContainer.innerHTML = `
-                <h2 class="mb-4 text-center">Results for: <span class="text-primary">"${query}"</span></h2>
+                <h2 class="mb-4 text-center">Results for: 
+                    <span class="text-primary">"${query}"</span>
+                </h2>
             `;
 
             displayNews(data.articles);
 
             input.value = ""; // clear input
+            document.querySelector('.main-hero').style.display = 'none'; // hide hero section after search
         })
         .catch(error => console.error('Error fetching news:', error));
 }
+
 
 
 function displayNews(articles) {
