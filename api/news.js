@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     if (query) {
       url = `https://newsapi.org/v2/everything?q=${query}&apiKey=${process.env.API_KEY}`;
     } else {
-      url = `https://newsapi.org/v2/top-headlines?country=ng&category=${category}&apiKey=${process.env.API_KEY}`;
+      url = `https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${process.env.API_KEY}`;
     }
 
     const response = await fetch(url);

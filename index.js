@@ -30,7 +30,6 @@ function searchNews() {
             displayNews(data.articles);
 
             input.value = ""; // clear input
-            document.querySelector('.main-hero').style.display = 'none'; // hide hero section after search
         })
         .catch(error => console.error('Error fetching news:', error));
 }
