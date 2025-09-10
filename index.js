@@ -1,4 +1,4 @@
-const API_key = "bf99c6b3e30c4dbfb200a2025bd9c8b8"
+// const API_key = "bf99c6b3e30c4dbfb200a2025bd9c8b8"
 
 function loadCategoryNews(category) {
     fetch(`/api/news?category=${category}`)
