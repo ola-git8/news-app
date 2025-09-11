@@ -11,29 +11,33 @@ const fetchWithTimeOut = async (resource, options = {}) => {
 
 const displayNews = articles => {
     const newsContainer = document.getElementById('newsContainer');
+
     if (!articles?.length) {
         newsContainer.innerHTML = `<p class="text-center">No news found for this category.</p>`;
         return;
     }
-    newsContainer.innerHTML = '';
-    articles.forEach(({ urlToImage, title, description, url }) => {
-        newsContainer.innerHTML += `
-            <div class="card mb-3">
-                <div class="row g-0">
-                    <div class="col-md-4">
-                        <img src="${urlToImage || 'https://via.placeholder.com/150'}" class="img-fluid rounded-start" loading="lazy" alt="...">
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <h5 class="card-title">${title}</h5>
-                            <p class="card-text">${description || ''}</p>
-                            <a href="${url}" target="_blank" class="btn btn-primary">Read more</a>
-                        </div>
+
+    const html = articles.map(({ urlToImage, title, description, url }) => `
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="${urlToImage || 'https://via.placeholder.com/150'}" 
+                             class="img-fluid rounded-start" 
+                             loading="lazy" 
+                             alt="${title}">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">${title}</h5>
+                        <p class="card-text">${description || ''}</p>
+                        <a href="${url}" target="_blank" class="btn btn-primary">Read more</a>
                     </div>
                 </div>
             </div>
-        `;
-    });
+        </div>
+    `).join('');
+
+    newsContainer.innerHTML = html;
 };
 
 const loadCategoryNews = async category => {
