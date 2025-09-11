@@ -14,6 +14,8 @@ function searchNews() {
     
     if (!query) return; // prevent empty search
 
+  
+
     // encode query for url safety
     const safeQuery = encodeURIComponent(query);
 
@@ -36,7 +38,18 @@ function searchNews() {
         })
         .catch(error => console.error('Error fetching news:', error));
 
-        const newsContainer = document.getElementById('newsContainer');
+
+        // Show loading message
+          const newsContainer = document.getElementById('newsContainer');
+    newsContainer.innerHTML = `
+        <h2 class="mb-4 text-center">Searching for:
+            <span class="text-primary">"${query}"</span>
+        </h2>
+        <p class="text-center">Please wait...</p>
+    `;
+
+    // In case of error, show error message
+       newsContainer = document.getElementById('newsContainer');
         newsContainer.innerHTML = `
             <h2 class="mb-4 text-center text-danger">Results for: 
               Oops! Could not fetch for results. Please try again later.
