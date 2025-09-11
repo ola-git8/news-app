@@ -13,6 +13,10 @@ function searchNews() {
     const query = input.value.trim(); 
     
     if (!query) return; // prevent empty search
+
+    // encode query for url safety
+    const safeQuery = encodeURIComponent(query);
+
     
     fetch(`/api/news?q=${query}`)
         .then(response => response.json())
@@ -31,6 +35,13 @@ function searchNews() {
             input.value = ""; // clear input
         })
         .catch(error => console.error('Error fetching news:', error));
+
+        const newsContainer = document.getElementById('newsContainer');
+        newsContainer.innerHTML = `
+            <h2 class="mb-4 text-center text-danger">Results for: 
+              Oops! Could not fetch for results. Please try again later.
+            </h2>
+        `;
 }
 
 
@@ -80,9 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-document.getElementById("searchInput").addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();
+document.getElementById("searchInput").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
         searchNews();
     }
 });
