@@ -14,7 +14,13 @@ function searchNews() {
     
     if (!query) return; // prevent empty search
 
-  
+    const newsContainer = document.getElementById('newsContainer');
+    newsContainer.innerHTML = `
+        <h2 class="mb-4 text-center">Searching for:
+            <span class="text-primary">"${query}"</span>
+        </h2>
+        <p class="text-center">Please wait...</p>
+    `;
 
     // encode query for url safety
     const safeQuery = encodeURIComponent(query);
@@ -40,13 +46,7 @@ function searchNews() {
 
 
         // Show loading message
-          const newsContainer = document.getElementById('newsContainer');
-    newsContainer.innerHTML = `
-        <h2 class="mb-4 text-center">Searching for:
-            <span class="text-primary">"${query}"</span>
-        </h2>
-        <p class="text-center">Please wait...</p>
-    `;
+        
 
     // In case of error, show error message
        newsContainer = document.getElementById('newsContainer');
