@@ -1,7 +1,7 @@
+// Fetch with timeout utility
 const fetchWithTimeOut = async (resource, options = {}) => {
-    const { timeout = 5000 } = options;
     const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
+    const id = setTimeout(() => controller.abort(), options.timeout || 5000);
     try {
         return await fetch(resource, { ...options, signal: controller.signal });
     } finally {
@@ -9,22 +9,18 @@ const fetchWithTimeOut = async (resource, options = {}) => {
     }
 };
 
+// Render news articles to the DOM
 const displayNews = articles => {
     const newsContainer = document.getElementById('newsContainer');
-
     if (!articles?.length) {
         newsContainer.innerHTML = `<p class="text-center">No news found for this category.</p>`;
         return;
     }
-
-    const html = articles.map(({ urlToImage, title, description, url }) => `
+    newsContainer.innerHTML = articles.map(({ urlToImage, title, description, url }) => `
         <div class="card mb-3">
             <div class="row g-0">
                 <div class="col-md-4">
-                    <img src="${urlToImage || 'https://via.placeholder.com/150'}" 
-                             class="img-fluid rounded-start" 
-                             loading="lazy" 
-                             alt="${title}">
+                    <img src="${urlToImage || 'https://via.placeholder.com/150'}" class="img-fluid rounded-start" loading="lazy" alt="${title}">
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">
@@ -36,53 +32,38 @@ const displayNews = articles => {
             </div>
         </div>
     `).join('');
-
-    newsContainer.innerHTML = html;
 };
 
+// Load news by category
 const loadCategoryNews = async category => {
     try {
         const res = await fetch(`/api/news?category=${category}`);
-        const data = await res.json();
-        displayNews(data.articles);
+        displayNews((await res.json()).articles);
     } catch (e) {
         console.error('Error fetching news:', e);
     }
 };
 
+// Search news by query
 const searchNews = async () => {
     const input = document.getElementById('searchInput');
     const query = input.value.trim();
     if (!query) return;
     const newsContainer = document.getElementById('newsContainer');
-    newsContainer.innerHTML = `
-        <h2 class="mb-4 text-center">Searching for:
-            <span class="text-primary">"${query}"</span>
-        </h2>
-        <p class="text-center">Please wait...</p>
-    `;
+    newsContainer.innerHTML = `<h2 class="mb-4 text-center">Searching for: <span class="text-primary">"${query}"</span></h2><p class="text-center">Please wait...</p>`;
     try {
         const res = await fetchWithTimeOut(`/api/news?q=${encodeURIComponent(query)}`, { timeout: 5000 });
         if (!res.ok) throw new Error(`Server error: ${res.status}`);
-        const data = await res.json();
-        newsContainer.innerHTML = `
-            <h2 class="mb-4 text-center">Results for: 
-                <span class="text-primary">"${query}"</span>
-            </h2>
-        `;
-        displayNews(data.articles);
+        newsContainer.innerHTML = `<h2 class="mb-4 text-center">Results for: <span class="text-primary">"${query}"</span></h2>`;
+        displayNews((await res.json()).articles);
         input.value = "";
     } catch (e) {
         console.error('Error fetching news:', e);
-        newsContainer.innerHTML = `
-            <h2 class="mb-4 text-center text-danger">
-              Oops! Could not fetch results for "${query}".  
-              Please check your connection and try again.
-            </h2>
-        `;
+        newsContainer.innerHTML = `<h2 class="mb-4 text-center text-danger">Oops! Could not fetch results for "${query}". Please check your connection and try again.</h2>`;
     }
 };
 
+// Init: load default news and set up event listeners
 document.addEventListener('DOMContentLoaded', () => {
     loadCategoryNews('general');
     document.querySelectorAll('.nav-link').forEach(link =>
@@ -92,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     );
 });
-
 document.getElementById("searchInput").addEventListener("keypress", e => {
     if (e.key === "Enter") {
         e.preventDefault();
