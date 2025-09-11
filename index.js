@@ -1,3 +1,15 @@
+function fetchWithTimeOut(resource, options = {}) {
+    const { timeout = 5000 } = options;
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+
+  return fetch(resource, {
+    ...options,
+    signal: controller.signal  
+    }).finally(() => clearTimeout(id));
+}
+
+
 
 function loadCategoryNews(category) {
     fetch(`/api/news?category=${category}`)
@@ -14,6 +26,7 @@ function searchNews() {
     
     if (!query) return; // prevent empty search
 
+      // Show loading message
     const newsContainer = document.getElementById('newsContainer');
     newsContainer.innerHTML = `
         <h2 class="mb-4 text-center">Searching for:
@@ -26,35 +39,37 @@ function searchNews() {
     const safeQuery = encodeURIComponent(query);
 
     
-    fetch(`/api/news?q=${query}`)
-        .then(response => response.json())
-        .then(data => {
-            const newsContainer = document.getElementById('newsContainer');
-            
-            // Add heading above search results
-            newsContainer.innerHTML = `
-                <h2 class="mb-4 text-center">Results for: 
-                    <span class="text-primary">"${query}"</span>
-                </h2>
-            `;
-
-            displayNews(data.articles);
-
-            input.value = ""; // clear input
-        })
-        .catch(error => console.error('Error fetching news:', error));
-
-
-        // Show loading message
+    fetchWithTimeOut(`/api/news?q=${safeQuery}`, { timeout: 5000 })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const newsContainer = document.getElementById('newsContainer');
         
-
-    // In case of error, show error message
-       newsContainer = document.getElementById('newsContainer');
+        // Add heading above search results
         newsContainer.innerHTML = `
-            <h2 class="mb-4 text-center text-danger">Results for: 
-              Oops! Could not fetch for results. Please try again later.
+            <h2 class="mb-4 text-center">Results for: 
+                <span class="text-primary">"${query}"</span>
             </h2>
         `;
+
+        displayNews(data.articles);
+        input.value = ""; // clear input
+    })
+    .catch(error => {
+        console.error('Error fetching news:', error);
+
+        // ✅ Show error message only if fetch fails
+        newsContainer.innerHTML = `
+            <h2 class="mb-4 text-center text-danger">
+              Oops! Could not fetch results for "${query}".  
+              Please check your connection and try again.
+            </h2>
+        `;
+    });
 }
 
 
